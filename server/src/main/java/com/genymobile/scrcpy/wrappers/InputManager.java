@@ -27,6 +27,10 @@ public final class InputManager {
     private static Method setActionButtonMethod;
     private static Method addUniqueIdAssociationByPortMethod;
     private static Method removeUniqueIdAssociationByPortMethod;
+    private static Method enableInputDeviceMethod;
+    private static Method disableInputDeviceMethod;
+    private static Method addPortAssociationMethod;
+    private static Method removePortAssociationMethod;
 
     static InputManager create() {
         android.hardware.input.InputManager manager = (android.hardware.input.InputManager) FakeContext.get()
@@ -141,6 +145,89 @@ public final class InputManager {
             method.invoke(manager, inputPort);
         } catch (ReflectiveOperationException e) {
             Ln.e("Cannot remove unique id association by port", e);
+        }
+    }
+
+    private static void logDeviceConfigError(String message, ReflectiveOperationException e) {
+        if (e instanceof InvocationTargetException && e.getCause() instanceof SecurityException) {
+            // Expected when the permission is not granted to the shell, the caller may try another way
+            Ln.d(message + ": " + e.getCause().getMessage());
+        } else {
+            Ln.e(message, e);
+        }
+    }
+
+    private static Method getEnableInputDeviceMethod() throws NoSuchMethodException {
+        if (enableInputDeviceMethod == null) {
+            enableInputDeviceMethod = android.hardware.input.InputManager.class.getMethod("enableInputDevice", int.class);
+        }
+        return enableInputDeviceMethod;
+    }
+
+    public boolean enableInputDevice(int id) {
+        try {
+            Method method = getEnableInputDeviceMethod();
+            method.invoke(manager, id);
+            return true;
+        } catch (ReflectiveOperationException e) {
+            logDeviceConfigError("Cannot enable input device", e);
+            return false;
+        }
+    }
+
+    private static Method getDisableInputDeviceMethod() throws NoSuchMethodException {
+        if (disableInputDeviceMethod == null) {
+            disableInputDeviceMethod = android.hardware.input.InputManager.class.getMethod("disableInputDevice", int.class);
+        }
+        return disableInputDeviceMethod;
+    }
+
+    public boolean disableInputDevice(int id) {
+        try {
+            Method method = getDisableInputDeviceMethod();
+            method.invoke(manager, id);
+            return true;
+        } catch (ReflectiveOperationException e) {
+            logDeviceConfigError("Cannot disable input device", e);
+            return false;
+        }
+    }
+
+    private static Method getAddPortAssociationMethod() throws NoSuchMethodException {
+        if (addPortAssociationMethod == null) {
+            addPortAssociationMethod = android.hardware.input.InputManager.class.getMethod("addPortAssociation", String.class, int.class);
+        }
+        return addPortAssociationMethod;
+    }
+
+    @TargetApi(AndroidVersions.API_30_ANDROID_11)
+    public boolean addPortAssociation(String inputPort, int displayPort) {
+        try {
+            Method method = getAddPortAssociationMethod();
+            method.invoke(manager, inputPort, displayPort);
+            return true;
+        } catch (ReflectiveOperationException e) {
+            logDeviceConfigError("Cannot add port association", e);
+            return false;
+        }
+    }
+
+    private static Method getRemovePortAssociationMethod() throws NoSuchMethodException {
+        if (removePortAssociationMethod == null) {
+            removePortAssociationMethod = android.hardware.input.InputManager.class.getMethod("removePortAssociation", String.class);
+        }
+        return removePortAssociationMethod;
+    }
+
+    @TargetApi(AndroidVersions.API_30_ANDROID_11)
+    public boolean removePortAssociation(String inputPort) {
+        try {
+            Method method = getRemovePortAssociationMethod();
+            method.invoke(manager, inputPort);
+            return true;
+        } catch (ReflectiveOperationException e) {
+            logDeviceConfigError("Cannot remove port association", e);
+            return false;
         }
     }
 }
