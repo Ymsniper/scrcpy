@@ -32,6 +32,7 @@ arguments=(
     '--crop=[\[width\:height\:x\:y\] Crop the device screen on the server]'
     {-d,--select-usb}'[Use USB device]'
     '--disable-screensaver[Disable screensaver while scrcpy is running]'
+    '--disable-touchscreen[Disable the physical touchscreen while scrcpy is running]'
     '--display-id=[Specify the display id to mirror]'
     '--display-ime-policy[Set the policy for selecting where the IME should be displayed]'
     '--display-orientation=[Set the initial display orientation]:orientation values:(0 90 180 270 flip0 flip90 flip180 flip270)'

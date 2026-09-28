@@ -25,6 +25,7 @@ _scrcpy() {
         --crop=
         -d --select-usb
         --disable-screensaver
+        --disable-touchscreen
         --display-id=
         --display-ime-policy=
         --display-orientation=

@@ -59,6 +59,7 @@ static void test_options(void) {
         "--record-format", "mkv",
         "--serial", "0123456789abcdef",
         "--show-touches",
+        "--disable-touchscreen",
         "--turn-screen-off",
         "--prefer-text",
         "--window-title", "my device",
@@ -86,6 +87,7 @@ static void test_options(void) {
     assert(opts->record_format == SC_RECORD_FORMAT_MKV);
     assert(!strcmp(opts->serial, "0123456789abcdef"));
     assert(opts->show_touches);
+    assert(opts->disable_touchscreen);
     assert(opts->turn_screen_off);
     assert(opts->key_inject_mode == SC_KEY_INJECT_MODE_TEXT);
     assert(!strcmp(opts->window_title, "my device"));

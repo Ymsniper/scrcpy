@@ -79,6 +79,7 @@ const struct scrcpy_options scrcpy_options_default = {
     .otg = false,
 #endif
     .show_touches = false,
+    .disable_touchscreen = false,
     .fullscreen = false,
     .always_on_top = false,
     .control = true,

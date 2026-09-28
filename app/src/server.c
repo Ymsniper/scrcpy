@@ -374,6 +374,9 @@ execute_server(struct sc_server *server,
     if (params->show_touches) {
         ADD_PARAM("show_touches=true");
     }
+    if (params->disable_touchscreen) {
+        ADD_PARAM("disable_touchscreen=true");
+    }
     if (params->stay_awake) {
         ADD_PARAM("stay_awake=true");
     }

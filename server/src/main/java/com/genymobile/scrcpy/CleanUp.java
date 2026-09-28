@@ -1,6 +1,7 @@
 package com.genymobile.scrcpy;
 
 import com.genymobile.scrcpy.device.Device;
+import com.genymobile.scrcpy.device.Touchscreen;
 import com.genymobile.scrcpy.util.Ln;
 import com.genymobile.scrcpy.util.Settings;
 import com.genymobile.scrcpy.util.SettingsException;
@@ -14,6 +15,9 @@ import android.system.Os;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handle the cleanup of scrcpy, even if the main process is killed.
@@ -59,6 +63,11 @@ public final class CleanUp {
             } catch (SettingsException e) {
                 Ln.e("Could not change \"show_touches\"", e);
             }
+        }
+
+        List<String> restoreTouchscreens = Collections.emptyList();
+        if (options.getDisableTouchscreen()) {
+            restoreTouchscreens = Touchscreen.disable();
         }
 
         int restoreStayOn = -1;
@@ -116,14 +125,14 @@ public final class CleanUp {
         boolean powerOffScreen = options.getPowerOffScreenOnClose();
 
         try {
-            run(displayId, restoreStayOn, disableShowTouches, powerOffScreen, restoreScreenOffTimeout, restoreDisplayImePolicy);
+            run(displayId, restoreStayOn, disableShowTouches, powerOffScreen, restoreScreenOffTimeout, restoreDisplayImePolicy, restoreTouchscreens);
         } catch (IOException e) {
             Ln.e("Clean up I/O exception", e);
         }
     }
 
     private void run(int displayId, int restoreStayOn, boolean disableShowTouches, boolean powerOffScreen, int restoreScreenOffTimeout,
-            int restoreDisplayImePolicy) throws IOException {
+            int restoreDisplayImePolicy, List<String> restoreTouchscreens) throws IOException {
         String[] cmd = {
                 "app_process",
                 "/",
@@ -137,6 +146,8 @@ public final class CleanUp {
         };
 
         ProcessBuilder builder = new ProcessBuilder(cmd);
+        // Variable number of arguments, so they must be last
+        builder.command().addAll(restoreTouchscreens);
         builder.environment().put("CLASSPATH", Server.SERVER_PATH);
         Process process = builder.start();
         OutputStream out = process.getOutputStream();
@@ -204,6 +215,7 @@ public final class CleanUp {
         boolean powerOffScreen = Boolean.parseBoolean(args[3]);
         int restoreScreenOffTimeout = Integer.parseInt(args[4]);
         int restoreDisplayImePolicy = Integer.parseInt(args[5]);
+        List<String> restoreTouchscreens = Arrays.asList(args).subList(6, args.length);
 
         // Dynamic option
         boolean restoreDisplayPower = false;
@@ -252,6 +264,11 @@ public final class CleanUp {
         if (restoreDisplayImePolicy != -1) {
             Ln.i("Restoring \"display IME policy\"");
             ServiceManager.getWindowManager().setDisplayImePolicy(displayId, restoreDisplayImePolicy);
+        }
+
+        if (!restoreTouchscreens.isEmpty()) {
+            Ln.i("Restoring touchscreen");
+            Touchscreen.restore(restoreTouchscreens);
         }
 
         // Change the power of the main display when mirroring a virtual display

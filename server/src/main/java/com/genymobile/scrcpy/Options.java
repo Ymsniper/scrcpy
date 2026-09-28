@@ -50,6 +50,7 @@ public class Options {
     private boolean cameraHighSpeed;
     private boolean cameraTorch;
     private boolean showTouches;
+    private boolean disableTouchscreen;
     private boolean stayAwake;
     private int screenOffTimeout = -1;
     private int displayImePolicy = -1;
@@ -197,6 +198,10 @@ public class Options {
 
     public boolean getShowTouches() {
         return showTouches;
+    }
+
+    public boolean getDisableTouchscreen() {
+        return disableTouchscreen;
     }
 
     public boolean getStayAwake() {
@@ -427,6 +432,9 @@ public class Options {
                     break;
                 case "show_touches":
                     options.showTouches = Boolean.parseBoolean(value);
+                    break;
+                case "disable_touchscreen":
+                    options.disableTouchscreen = Boolean.parseBoolean(value);
                     break;
                 case "stay_awake":
                     options.stayAwake = Boolean.parseBoolean(value);

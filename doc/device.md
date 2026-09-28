@@ -133,6 +133,26 @@ adb shell settings put system show_touches 1
 adb shell settings put system show_touches 0
 ```
 
+
+## Disable touchscreen
+
+A broken screen may report ghost touches, which interfere with the control from
+the computer.
+
+_Scrcpy_ provides an option to disable the physical touchscreen on start and
+enable it back on exit:
+
+```bash
+scrcpy --disable-touchscreen
+```
+
+Events injected by _scrcpy_ are not affected.
+
+This requires Android 14 or above. On Android 8.1 to 13, it only works if adb
+runs as root (`adb root`, which is not available on most production builds).
+
+In any case, the touchscreen is enabled back when the device reboots.
+
 ## Power off on close
 
 To turn the device screen off when closing _scrcpy_:

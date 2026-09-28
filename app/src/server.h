@@ -57,6 +57,7 @@ struct sc_server_params {
     bool audio;
     bool audio_dup;
     bool show_touches;
+    bool disable_touchscreen;
     bool stay_awake;
     bool force_adb_forward;
     bool power_off_on_close;

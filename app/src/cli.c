@@ -111,6 +111,7 @@ enum {
     OPT_RENDER_FIT,
     OPT_IGNORE_VIDEO_ENCODER_CONSTRAINTS,
     OPT_NO_TERMINAL_TITLE,
+    OPT_DISABLE_TOUCHSCREEN,
 };
 
 struct sc_option {
@@ -357,6 +358,15 @@ static const struct sc_option options[] = {
         .longopt_id = OPT_DISABLE_SCREENSAVER,
         .longopt = "disable-screensaver",
         .text = "Disable screensaver while scrcpy is running.",
+    },
+    {
+        .longopt_id = OPT_DISABLE_TOUCHSCREEN,
+        .longopt = "disable-touchscreen",
+        .text = "Disable the physical touchscreen of the device while scrcpy "
+                "is running, typically to ignore ghost touches from a broken "
+                "screen. Events injected by scrcpy are not affected.\n"
+                "This requires Android >= 14 (or Android >= 8.1 with adb "
+                "running as root).",
     },
     {
         .longopt_id = OPT_DISPLAY_ID,
@@ -2714,6 +2724,9 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
             case OPT_DISABLE_SCREENSAVER:
                 opts->disable_screensaver = true;
                 break;
+            case OPT_DISABLE_TOUCHSCREEN:
+                opts->disable_touchscreen = true;
+                break;
             case OPT_SHORTCUT_MOD:
                 if (!parse_shortcut_mods(optarg, &opts->shortcut_mods)) {
                     return false;
@@ -3430,6 +3443,10 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
             LOGE("Cannot request to show touches if control is disabled");
             return false;
         }
+        if (opts->disable_touchscreen) {
+            LOGE("Cannot disable the touchscreen if control is disabled");
+            return false;
+        }
         if (opts->power_off_on_close) {
             LOGE("Cannot request power off on close if control is disabled");
             return false;
@@ -3477,6 +3494,10 @@ parse_args_with_getopt(struct scrcpy_cli_args *args, int argc, char *argv[],
         }
         if (opts->show_touches) {
             LOGE("OTG mode: could not request to show touches");
+            return false;
+        }
+        if (opts->disable_touchscreen) {
+            LOGE("OTG mode: could not disable the touchscreen");
             return false;
         }
         if (opts->power_off_on_close) {

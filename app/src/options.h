@@ -298,6 +298,7 @@ struct scrcpy_options {
     bool otg;
 #endif
     bool show_touches;
+    bool disable_touchscreen;
     bool fullscreen;
     bool always_on_top;
     bool control;
